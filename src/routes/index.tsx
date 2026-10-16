@@ -17,7 +17,7 @@ export const Route = createFileRoute("/")({
   component: Welcome,
 });
 
-export const STAGES = [
+const STAGES = [
   { icon: HeartHandshake, name: "Empathize", text: "Onboarding asks how you learn, your level and confidence — every student is different." },
   { icon: Target, name: "Define", text: "A diagnostic quiz pinpoints weak topics and gaps in understanding." },
   { icon: Lightbulb, name: "Ideate", text: "The engine builds a personal path, explaining why each lesson is suggested." },
@@ -25,7 +25,7 @@ export const STAGES = [
   { icon: TestTube2, name: "Test", text: "Progress analytics and your feedback show what works and what to improve." },
 ];
 
-export function AdaptsSection() {
+function AdaptsSection() {
   return (
     <section aria-labelledby="adapts" className="rounded-3xl border bg-card p-6 shadow-card sm:p-8">
       <h2 id="adapts" className="text-2xl font-bold">How LearnLoop Adapts to You</h2>
