@@ -115,7 +115,7 @@ export function nextQuestion(topics: TopicId[], difficulty: Difficulty, asked: s
   const score = (q: Question) => Math.abs(q.difficulty - difficulty) * 10 + (q.topic === preferredTopic ? 0 : 1);
   const best = Math.min(...remaining.map(score));
   const pool = remaining.filter((q) => score(q) === best);
-  return pool[Math.floor(Math.random() * pool.length)];
+  return pool[Math.floor(Math.random() * pool.length)]!;
 }
 
 export interface AdaptState {

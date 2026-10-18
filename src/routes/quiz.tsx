@@ -11,7 +11,7 @@ const MODES: QuizMode[] = ["diagnostic", "adaptive", "revision"];
 
 export const Route = createFileRoute("/quiz")({
   validateSearch: (s: Record<string, unknown>): { mode: QuizMode } => ({
-    mode: MODES.includes(s.mode as QuizMode) ? (s.mode as QuizMode) : "adaptive",
+    mode: MODES.includes(s['mode'] as QuizMode) ? (s['mode'] as QuizMode) : "adaptive",
   }),
   head: () => ({
     meta: [

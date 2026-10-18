@@ -12,7 +12,7 @@ const ids = TOPICS.map((t) => t.id) as string[];
 
 export const Route = createFileRoute("/learn")({
   validateSearch: (s: Record<string, unknown>): { topic?: TopicId } =>
-    ids.includes(s.topic as string) ? { topic: s.topic as TopicId } : {},
+    ids.includes(s['topic'] as string) ? { topic: s['topic'] as TopicId } : {},
   head: () => ({
     meta: [
       { title: "Lessons — LearnLoop AI" },

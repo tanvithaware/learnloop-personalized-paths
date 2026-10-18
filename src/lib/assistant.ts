@@ -44,7 +44,7 @@ function respond(text: string, ctx: AssistantContext): string {
     return `**Revision notes — ${lesson.title}**\n\n` + lesson.keyPoints.map((k) => `• ${k}`).join("\n");
   }
   if (t.includes("practice") || t.includes("question") || t.includes("quiz")) {
-    const q = QUESTIONS.filter((x) => x.topic === topic)[Math.floor(Math.random() * 5)];
+    const q = QUESTIONS.filter((x) => x.topic === topic)[Math.floor(Math.random() * 5)]!;
     return `**Practice question**\n\n${q.q}\n\nA) ${q.options[0]}\nB) ${q.options[1]}\nC) ${q.options[2]}\nD) ${q.options[3]}\n\nAnswer: ${"ABCD"[q.answer]} — ${q.explain}`;
   }
   const q = QUESTIONS.find((x) => x.topic === topic && x.difficulty === 1)!;
@@ -54,7 +54,7 @@ function respond(text: string, ctx: AssistantContext): string {
 export const simulatedAssistant: AssistantProvider = {
   label: "Simulated assistant (predefined responses — no AI model connected)",
   ask: (messages, ctx) =>
-    new Promise((resolve) => setTimeout(() => resolve(respond(messages[messages.length - 1].content, ctx)), 700)),
+    new Promise((resolve) => setTimeout(() => resolve(respond(messages[messages.length - 1]!.content, ctx)), 700)),
 };
 
 export const assistant: AssistantProvider = simulatedAssistant;
