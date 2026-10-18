@@ -58,7 +58,7 @@ function Quiz({ mode, onRestart }: { mode: QuizMode; onRestart: () => void }) {
   const [ad, setAd] = useState<AdaptState>({ difficulty: startDiff, correctRun: 0, wrongRun: 0, simpleMode: mode === "revision" });
   const [notice, setNotice] = useState<string>();
   const [answers, setAnswers] = useState<{ q: Question; correct: boolean; picked: number }[]>([]);
-  const [current, setCurrent] = useState<Question | null>(() => fixed ? fixed[0] : nextQuestion(pool, startDiff, [], 0));
+  const [current, setCurrent] = useState<Question | null>(() => fixed ? fixed[0]! : nextQuestion(pool, startDiff, [], 0));
   const [picked, setPicked] = useState<number | null>(null);
   const [submitted, setSubmitted] = useState(false);
   const saved = useRef(false);
@@ -80,7 +80,7 @@ function Quiz({ mode, onRestart }: { mode: QuizMode; onRestart: () => void }) {
   const next = () => {
     setSubmitted(false); setPicked(null); setNotice(undefined);
     if (answers.length >= total) { setCurrent(null); return; }
-    setCurrent(fixed ? fixed[answers.length] : nextQuestion(pool, ad.difficulty, answers.map((a) => a.q.id), answers.length));
+    setCurrent(fixed ? fixed[answers.length]! : nextQuestion(pool, ad.difficulty, answers.map((a) => a.q.id), answers.length));
   };
 
   const result = useMemo(() => tally(answers), [answers]);
@@ -151,7 +151,7 @@ function Results({ mode, result, answers, onRestart }: { mode: QuizMode; result:
   const s = useStore();
   const pct = Math.round((result.score / Math.max(1, result.total)) * 100);
   const recs = recommend(computeMastery(s.history, s.completed), s.completed, s.profile?.format);
-  const top = recs[0];
+  const top = recs[0]!;
   return (
     <div className="mx-auto max-w-3xl space-y-5">
       <Card className="text-center">
