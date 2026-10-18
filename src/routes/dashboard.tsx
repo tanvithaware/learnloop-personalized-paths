@@ -27,7 +27,7 @@ function Dashboard() {
   const overall = Math.round((s.completed.length / LESSONS.length) * 50 + (assessed.length ? assessed.reduce((a, m) => a + m.score!, 0) / assessed.length / 2 : 0));
   const strong = mastery.filter((m) => m.status === "Strong");
   const weak = mastery.filter((m) => m.status === "Needs Practice" || m.status === "Improving");
-  const next = recs.find((r) => r.action === "lesson") ?? recs[0];
+  const next = recs.find((r) => r.action === "lesson") ?? recs[0]!;
   const week = Array.from({ length: 7 }, (_, i) => {
     const d = new Date(Date.now() - (6 - i) * 86400000);
     return { day: d.toLocaleDateString("en", { weekday: "short" }), minutes: s.activity[dayKey(d)] ?? 0 };

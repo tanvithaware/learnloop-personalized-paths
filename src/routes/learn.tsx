@@ -12,7 +12,7 @@ const ids = TOPICS.map((t) => t.id) as string[];
 
 export const Route = createFileRoute("/learn")({
   validateSearch: (s: Record<string, unknown>): { topic?: TopicId } =>
-    ids.includes(s.topic as string) ? { topic: s.topic as TopicId } : {},
+    ids.includes(s['topic'] as string) ? { topic: s['topic'] as TopicId } : {},
   head: () => ({
     meta: [
       { title: "Lessons — LearnLoop AI" },
@@ -30,7 +30,7 @@ function Learn() {
   const s = useStore();
   const mastery = computeMastery(s.history, s.completed);
   const idx = LESSONS.findIndex((l) => l.topic === topic);
-  const lesson = LESSONS[idx];
+  const lesson = LESSONS[idx]!;
   const done = s.completed.includes(topic);
   const fmt = s.profile?.format;
   const go = (t: TopicId) => navigate({ to: "/learn", search: { topic: t } });
@@ -83,13 +83,13 @@ function Learn() {
         <Practice key={topic} p={lesson.practice} highlight={fmt === "practice"} />
 
         <div className="flex flex-wrap items-center justify-between gap-3">
-          <Button variant="outline" className="rounded-xl" disabled={idx === 0} onClick={() => go(LESSONS[idx - 1].topic)}><ArrowLeft /> Previous</Button>
+          <Button variant="outline" className="rounded-xl" disabled={idx === 0} onClick={() => go(LESSONS[idx - 1]!.topic)}><ArrowLeft /> Previous</Button>
           <Button variant={done ? "soft" : "hero"} size="lg" disabled={done}
             onClick={() => { s.completeLesson(topic); toast.success("Lesson completed! Mastery +10%"); }}>
             <CheckCircle2 /> {done ? "Completed" : "Mark as Completed"}
           </Button>
           {idx < LESSONS.length - 1 ? (
-            <Button variant="outline" className="rounded-xl" onClick={() => go(LESSONS[idx + 1].topic)}>Next <ArrowRight /></Button>
+            <Button variant="outline" className="rounded-xl" onClick={() => go(LESSONS[idx + 1]!.topic)}>Next <ArrowRight /></Button>
           ) : (
             <Button variant="outline" className="rounded-xl" asChild><Link to="/quiz" search={{ mode: "adaptive" }}>Adaptive quiz <ArrowRight /></Link></Button>
           )}
