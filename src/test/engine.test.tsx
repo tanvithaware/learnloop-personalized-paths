@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { adapt, statusFor } from "@/lib/engine";
+import { adapt, statusCounts, statusFor } from "@/lib/engine";
 
 describe("adaptive engine rules", () => {
   it("raises difficulty after 2 correct in a row", () => {
@@ -16,5 +16,15 @@ describe("adaptive engine rules", () => {
     expect(statusFor(80)).toBe("Strong");
     expect(statusFor(60)).toBe("Improving");
     expect(statusFor(40)).toBe("Needs Practice");
+  });
+  it("counts topics per status for the results pie chart", () => {
+    const counts = statusCounts([
+      { status: "Strong" }, { status: "Strong" }, { status: "Needs Practice" }, { status: "Not assessed" },
+    ]);
+    expect(counts).toEqual([
+      { name: "Strong", value: 2 },
+      { name: "Needs Practice", value: 1 },
+      { name: "Not assessed", value: 1 },
+    ]);
   });
 });

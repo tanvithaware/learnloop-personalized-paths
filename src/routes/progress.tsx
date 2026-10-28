@@ -1,10 +1,11 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { useState } from "react";
 import { ArrowDownRight, ArrowUpRight, BookOpen } from "lucide-react";
-import { Bar as RBar, BarChart, CartesianGrid, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
+import { Bar as RBar, BarChart, CartesianGrid, Cell, Line, LineChart, Pie, PieChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { AppShell, Card, StatusPill } from "@/components/AppShell";
 import { Button } from "@/components/ui/button";
 import { LESSONS, TOPICS, topicName } from "@/lib/data";
-import { computeMastery, recommend } from "@/lib/engine";
+import { computeMastery, recommend, statusCounts, type Mastery, type QuizRecord } from "@/lib/engine";
 import { useStore } from "@/lib/store";
 
 export const Route = createFileRoute("/progress")({
@@ -70,6 +71,7 @@ function Progress() {
           </BarChart></ResponsiveContainer></div>
         </Card>
       </div>
+      <ResultsPie mastery={mastery} history={s.history} />
       <Card>
         <h3 className="font-semibold">Recommended study priorities</h3>
         {recs.length === 0 ? <p className="mt-3 text-sm text-muted-foreground">All topics are strong — try challenge-mode adaptive quizzes!</p> : (
@@ -87,3 +89,66 @@ function Progress() {
     </div>
   );
 }
+
+const PIE_COLOR: Record<string, string> = {
+  Strong: "var(--chart-4)",
+  Improving: "var(--chart-5)",
+  "Needs Practice": "var(--destructive)",
+  "Not assessed": "var(--muted-foreground)",
+  Correct: "var(--chart-4)",
+  Incorrect: "var(--destructive)",
+};
+
+function ResultsPie({ mastery, history }: { mastery: Mastery[]; history: QuizRecord[] }) {
+  const [view, setView] = useState<"mastery" | "answers">("mastery");
+  const answered = history.reduce((a, h) => a + h.total, 0);
+  const right = history.reduce((a, h) => a + h.score, 0);
+  const data: { name: string; value: number }[] = view === "mastery"
+    ? statusCounts(mastery)
+    : [{ name: "Correct", value: right }, { name: "Incorrect", value: answered - right }].filter((d) => d.value > 0);
+  const total = data.reduce((a, d) => a + d.value, 0) || 1;
+
+  return (
+    <Card>
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <div>
+          <h3 className="font-semibold">Results breakdown</h3>
+          <p className="text-sm text-muted-foreground">
+            {view === "mastery" ? "How your topics are tracking after your quizzes." : "Correct vs incorrect answers across every quiz."}
+          </p>
+        </div>
+        <div className="flex rounded-full border bg-muted p-1 text-xs font-semibold">
+          {(["mastery", "answers"] as const).map((v) => (
+            <button key={v} type="button" onClick={() => setView(v)} aria-pressed={view === v}
+              className={`rounded-full px-3 py-1.5 transition-colors ${view === v ? "bg-card shadow-card" : "text-muted-foreground"}`}>
+              {v === "mastery" ? "Topic mastery" : "Answer accuracy"}
+            </button>
+          ))}
+        </div>
+      </div>
+      <div className="mt-4 grid items-center gap-6 sm:grid-cols-2">
+        <div className="h-64">
+          <ResponsiveContainer>
+            <PieChart>
+              <Pie data={data} dataKey="value" nameKey="name" innerRadius="58%" outerRadius="88%" paddingAngle={1.5} stroke="none" isAnimationActive={false}>
+                {data.map((d) => <Cell key={d.name} fill={PIE_COLOR[d.name] ?? "var(--chart-1)"} />)}
+              </Pie>
+              <Tooltip />
+            </PieChart>
+          </ResponsiveContainer>
+        </div>
+        <ul className="space-y-2 text-sm">
+          {data.map((d) => (
+            <li key={d.name} className="flex items-center gap-3">
+              <span className="h-3 w-3 shrink-0 rounded-full" style={{ background: PIE_COLOR[d.name] ?? "var(--chart-1)" }} />
+              <span className="flex-1">{d.name}</span>
+              <span className="font-semibold">{d.value}</span>
+              <span className="w-12 text-right text-muted-foreground">{Math.round((d.value / total) * 100)}%</span>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </Card>
+  );
+}
+

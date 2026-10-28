@@ -156,3 +156,11 @@ export function tally(answers: { q: Question; correct: boolean }[]) {
     wrong: answers.filter((a) => !a.correct).map((a) => a.q.id),
   };
 }
+
+export const STATUS_ORDER = ["Strong", "Improving", "Needs Practice", "Not assessed"] as const;
+
+/** How many topics sit in each mastery status — drives the results pie chart. */
+export function statusCounts(m: readonly { status: TopicStatus }[]): { name: TopicStatus; value: number }[] {
+  return STATUS_ORDER.map((name) => ({ name, value: m.filter((x) => x.status === name).length })).filter((x) => x.value > 0);
+}
+
