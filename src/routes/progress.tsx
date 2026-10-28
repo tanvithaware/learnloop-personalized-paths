@@ -107,7 +107,7 @@ const SUBJECT_COLOR: Record<string, string> = {
 };
 
 type PieView = "mastery" | "answers" | "subjects";
-type PieDatum = { name: string; value: number; color: string; detail?: string };
+type PieDatum = { name: string; value: number; color: string; detail?: string; status?: string };
 
 const VIEWS: { id: PieView; label: string; caption: string; unit: string }[] = [
   { id: "mastery", label: "Topic mastery", caption: "How your topics are tracking after your quizzes.", unit: "topics" },
@@ -132,6 +132,7 @@ function ResultsPie({ mastery, history }: { mastery: Mastery[]; history: QuizRec
             value: r.total,
             color: SUBJECT_COLOR[r.topic] ?? "var(--chart-1)",
             detail: `${r.correct}/${r.total} correct · ${r.accuracy}%`,
+            status: mastery.find((m) => m.topic === r.topic)?.status,
           }));
 
   const sum = data.reduce((a, d) => a + d.value, 0);
@@ -161,7 +162,10 @@ function ResultsPie({ mastery, history }: { mastery: Mastery[]; history: QuizRec
               <Pie data={data} dataKey="value" nameKey="name" innerRadius="58%" outerRadius="88%" paddingAngle={1.5} stroke="none" isAnimationActive={false}>
                 {data.map((d) => <Cell key={d.name} fill={d.color} />)}
               </Pie>
-              <Tooltip formatter={(value: number | string, name: string) => [`${value} (${Math.round((Number(value) / total) * 100)}%)`, name]} />
+              <Tooltip formatter={(value: number | string, name: string) => {
+                const d = data.find((x) => x.name === name);
+                return [`${value} (${Math.round((Number(value) / total) * 100)}%)`, d?.status ? `${name} — ${d.status}` : name];
+              }} />
             </PieChart>
           </ResponsiveContainer>
           <div className="pointer-events-none absolute inset-0 grid place-items-center text-center">
@@ -176,7 +180,10 @@ function ResultsPie({ mastery, history }: { mastery: Mastery[]; history: QuizRec
             <li key={d.name} className="flex items-center gap-3">
               <span className="h-3 w-3 shrink-0 rounded-full" style={{ background: d.color }} />
               <span className="min-w-0 flex-1">
-                <span className="block truncate">{d.name}</span>
+                <span className="flex flex-wrap items-center gap-2">
+                  <span className="truncate">{d.name}</span>
+                  {d.status && <StatusPill status={d.status} />}
+                </span>
                 {d.detail && <span className="block text-xs text-muted-foreground">{d.detail}</span>}
               </span>
               <span className="font-semibold">{d.value}</span>
