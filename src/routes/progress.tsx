@@ -107,7 +107,7 @@ const SUBJECT_COLOR: Record<string, string> = {
 };
 
 type PieView = "mastery" | "answers" | "subjects";
-type PieDatum = { name: string; value: number; color: string; detail?: string };
+type PieDatum = { name: string; value: number; color: string; detail?: string; status?: string };
 
 const VIEWS: { id: PieView; label: string; caption: string; unit: string }[] = [
   { id: "mastery", label: "Topic mastery", caption: "How your topics are tracking after your quizzes.", unit: "topics" },
@@ -132,6 +132,7 @@ function ResultsPie({ mastery, history }: { mastery: Mastery[]; history: QuizRec
             value: r.total,
             color: SUBJECT_COLOR[r.topic] ?? "var(--chart-1)",
             detail: `${r.correct}/${r.total} correct · ${r.accuracy}%`,
+            status: mastery.find((m) => m.topic === r.topic)?.status,
           }));
 
   const sum = data.reduce((a, d) => a + d.value, 0);
@@ -161,7 +162,10 @@ function ResultsPie({ mastery, history }: { mastery: Mastery[]; history: QuizRec
               <Pie data={data} dataKey="value" nameKey="name" innerRadius="58%" outerRadius="88%" paddingAngle={1.5} stroke="none" isAnimationActive={false}>
                 {data.map((d) => <Cell key={d.name} fill={d.color} />)}
               </Pie>
-              <Tooltip formatter={(value: number | string, name: string) => [`${value} (${Math.round((Number(value) / total) * 100)}%)`, name]} />
+              <Tooltip formatter={(value: number | string, name: string) => {
+                const d = data.find((x) => x.name === name);
+                return [`${value} (${Math.round((Number(value) / total) * 100)}%)`, d?.status ? `${name} — ${d.status}` : name];
+              }} />
             </PieChart>
           </ResponsiveContainer>
           <div className="pointer-events-none absolute inset-0 grid place-items-center text-center">
