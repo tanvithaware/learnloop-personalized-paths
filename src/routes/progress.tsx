@@ -1,10 +1,11 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { useState } from "react";
 import { ArrowDownRight, ArrowUpRight, BookOpen } from "lucide-react";
-import { Bar as RBar, BarChart, CartesianGrid, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
+import { Bar as RBar, BarChart, CartesianGrid, Cell, Line, LineChart, Pie, PieChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { AppShell, Card, StatusPill } from "@/components/AppShell";
 import { Button } from "@/components/ui/button";
 import { LESSONS, TOPICS, topicName } from "@/lib/data";
-import { computeMastery, recommend } from "@/lib/engine";
+import { computeMastery, recommend, statusCounts, type Mastery, type QuizRecord } from "@/lib/engine";
 import { useStore } from "@/lib/store";
 
 export const Route = createFileRoute("/progress")({

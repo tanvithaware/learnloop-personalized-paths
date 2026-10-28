@@ -17,4 +17,14 @@ describe("adaptive engine rules", () => {
     expect(statusFor(60)).toBe("Improving");
     expect(statusFor(40)).toBe("Needs Practice");
   });
+  it("counts topics per status for the results pie chart", () => {
+    const counts = statusCounts([
+      { status: "Strong" }, { status: "Strong" }, { status: "Needs Practice" }, { status: "Not assessed" },
+    ]);
+    expect(counts).toEqual([
+      { name: "Strong", value: 2 },
+      { name: "Needs Practice", value: 1 },
+      { name: "Not assessed", value: 1 },
+    ]);
+  });
 });
