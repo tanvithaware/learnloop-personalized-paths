@@ -180,7 +180,10 @@ function ResultsPie({ mastery, history }: { mastery: Mastery[]; history: QuizRec
             <li key={d.name} className="flex items-center gap-3">
               <span className="h-3 w-3 shrink-0 rounded-full" style={{ background: d.color }} />
               <span className="min-w-0 flex-1">
-                <span className="block truncate">{d.name}</span>
+                <span className="flex flex-wrap items-center gap-2">
+                  <span className="truncate">{d.name}</span>
+                  {d.status && <StatusPill status={d.status} />}
+                </span>
                 {d.detail && <span className="block text-xs text-muted-foreground">{d.detail}</span>}
               </span>
               <span className="font-semibold">{d.value}</span>
