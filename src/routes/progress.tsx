@@ -71,6 +71,7 @@ function Progress() {
           </BarChart></ResponsiveContainer></div>
         </Card>
       </div>
+      <ResultsPie mastery={mastery} history={s.history} />
       <Card>
         <h3 className="font-semibold">Recommended study priorities</h3>
         {recs.length === 0 ? <p className="mt-3 text-sm text-muted-foreground">All topics are strong — try challenge-mode adaptive quizzes!</p> : (
