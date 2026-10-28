@@ -27,4 +27,17 @@ describe("adaptive engine rules", () => {
       { name: "Not assessed", value: 1 },
     ]);
   });
+  it("adds up results per subject for the subject pie chart", () => {
+    const rows = subjectResults([
+      { id: "a", date: "2026-10-01", mode: "diagnostic", score: 3, total: 4, wrong: [],
+        byTopic: { prog: { correct: 2, total: 2 }, ds: { correct: 1, total: 2 } } },
+      { id: "b", date: "2026-10-02", mode: "adaptive", score: 1, total: 2, wrong: ["q9"],
+        byTopic: { prog: { correct: 1, total: 2 }, dbms: { correct: 0, total: 1 } } },
+    ]);
+    expect(rows).toEqual([
+      { topic: "prog", name: "Programming", correct: 3, total: 4, accuracy: 75 },
+      { topic: "ds", name: "Data Structures", correct: 1, total: 2, accuracy: 50 },
+      { topic: "dbms", name: "DBMS", correct: 0, total: 1, accuracy: 0 },
+    ]);
+  });
 });

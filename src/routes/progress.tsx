@@ -5,7 +5,7 @@ import { Bar as RBar, BarChart, CartesianGrid, Cell, Line, LineChart, Pie, PieCh
 import { AppShell, Card, StatusPill } from "@/components/AppShell";
 import { Button } from "@/components/ui/button";
 import { LESSONS, TOPICS, topicName } from "@/lib/data";
-import { computeMastery, recommend, statusCounts, type Mastery, type QuizRecord } from "@/lib/engine";
+import { computeMastery, recommend, statusCounts, subjectResults, type Mastery, type QuizRecord } from "@/lib/engine";
 import { useStore } from "@/lib/store";
 
 export const Route = createFileRoute("/progress")({

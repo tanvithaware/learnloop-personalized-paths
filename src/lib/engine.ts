@@ -164,3 +164,27 @@ export function statusCounts(m: readonly { status: TopicStatus }[]): { name: Top
   return STATUS_ORDER.map((name) => ({ name, value: m.filter((x) => x.status === name).length })).filter((x) => x.value > 0);
 }
 
+export interface SubjectResult {
+  topic: TopicId;
+  name: string;
+  correct: number;
+  total: number;
+  accuracy: number;
+}
+
+/** Questions answered and accuracy per subject across every quiz — drives the subject pie chart. */
+export function subjectResults(history: readonly QuizRecord[]): SubjectResult[] {
+  return TOPICS.map(({ id, short }) => {
+    let correct = 0;
+    let total = 0;
+    for (const h of history) {
+      const t = h.byTopic[id];
+      if (t) {
+        correct += t.correct;
+        total += t.total;
+      }
+    }
+    return { topic: id, name: short, correct, total, accuracy: total ? Math.round((correct / total) * 100) : 0 };
+  }).filter((r) => r.total > 0);
+}
+
