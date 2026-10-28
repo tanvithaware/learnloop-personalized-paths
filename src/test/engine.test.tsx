@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { adapt, statusCounts, statusFor } from "@/lib/engine";
+import { adapt, statusCounts, statusFor, subjectResults } from "@/lib/engine";
 
 describe("adaptive engine rules", () => {
   it("raises difficulty after 2 correct in a row", () => {

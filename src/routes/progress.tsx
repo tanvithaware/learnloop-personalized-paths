@@ -99,49 +99,86 @@ const PIE_COLOR: Record<string, string> = {
   Incorrect: "var(--destructive)",
 };
 
+const SUBJECT_COLOR: Record<string, string> = {
+  prog: "var(--chart-1)",
+  ds: "var(--chart-2)",
+  dbms: "var(--chart-3)",
+  cn: "var(--chart-4)",
+};
+
+type PieView = "mastery" | "answers" | "subjects";
+type PieDatum = { name: string; value: number; color: string; detail?: string };
+
+const VIEWS: { id: PieView; label: string; caption: string; unit: string }[] = [
+  { id: "mastery", label: "Topic mastery", caption: "How your topics are tracking after your quizzes.", unit: "topics" },
+  { id: "answers", label: "Answer accuracy", caption: "Correct vs incorrect answers across every quiz.", unit: "answers" },
+  { id: "subjects", label: "Subject results", caption: "Questions answered in each subject, with your accuracy there.", unit: "questions" },
+];
+
 function ResultsPie({ mastery, history }: { mastery: Mastery[]; history: QuizRecord[] }) {
-  const [view, setView] = useState<"mastery" | "answers">("mastery");
+  const [view, setView] = useState<PieView>("mastery");
   const answered = history.reduce((a, h) => a + h.total, 0);
   const right = history.reduce((a, h) => a + h.score, 0);
-  const data: { name: string; value: number }[] = view === "mastery"
-    ? statusCounts(mastery)
-    : [{ name: "Correct", value: right }, { name: "Incorrect", value: answered - right }].filter((d) => d.value > 0);
-  const total = data.reduce((a, d) => a + d.value, 0) || 1;
+
+  const data: PieDatum[] =
+    view === "mastery"
+      ? statusCounts(mastery).map((d) => ({ ...d, color: PIE_COLOR[d.name] ?? "var(--chart-1)" }))
+      : view === "answers"
+        ? [{ name: "Correct", value: right }, { name: "Incorrect", value: answered - right }]
+            .filter((d) => d.value > 0)
+            .map((d) => ({ ...d, color: PIE_COLOR[d.name] ?? "var(--chart-1)" }))
+        : subjectResults(history).map((r) => ({
+            name: r.name,
+            value: r.total,
+            color: SUBJECT_COLOR[r.topic] ?? "var(--chart-1)",
+            detail: `${r.correct}/${r.total} correct · ${r.accuracy}%`,
+          }));
+
+  const sum = data.reduce((a, d) => a + d.value, 0);
+  const total = sum || 1;
+  const active = VIEWS.find((v) => v.id === view)!;
 
   return (
     <Card>
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <h3 className="font-semibold">Results breakdown</h3>
-          <p className="text-sm text-muted-foreground">
-            {view === "mastery" ? "How your topics are tracking after your quizzes." : "Correct vs incorrect answers across every quiz."}
-          </p>
+          <p className="text-sm text-muted-foreground">{active.caption}</p>
         </div>
         <div className="flex rounded-full border bg-muted p-1 text-xs font-semibold">
-          {(["mastery", "answers"] as const).map((v) => (
-            <button key={v} type="button" onClick={() => setView(v)} aria-pressed={view === v}
-              className={`rounded-full px-3 py-1.5 transition-colors ${view === v ? "bg-card shadow-card" : "text-muted-foreground"}`}>
-              {v === "mastery" ? "Topic mastery" : "Answer accuracy"}
+          {VIEWS.map((v) => (
+            <button key={v.id} type="button" onClick={() => setView(v.id)} aria-pressed={view === v.id}
+              className={`rounded-full px-3 py-1.5 transition-colors ${view === v.id ? "bg-card shadow-card" : "text-muted-foreground"}`}>
+              {v.label}
             </button>
           ))}
         </div>
       </div>
       <div className="mt-4 grid items-center gap-6 sm:grid-cols-2">
-        <div className="h-64">
+        <div className="relative h-64">
           <ResponsiveContainer>
             <PieChart>
               <Pie data={data} dataKey="value" nameKey="name" innerRadius="58%" outerRadius="88%" paddingAngle={1.5} stroke="none" isAnimationActive={false}>
-                {data.map((d) => <Cell key={d.name} fill={PIE_COLOR[d.name] ?? "var(--chart-1)"} />)}
+                {data.map((d) => <Cell key={d.name} fill={d.color} />)}
               </Pie>
-              <Tooltip />
+              <Tooltip formatter={(value: number | string, name: string) => [`${value} (${Math.round((Number(value) / total) * 100)}%)`, name]} />
             </PieChart>
           </ResponsiveContainer>
+          <div className="pointer-events-none absolute inset-0 grid place-items-center text-center">
+            <div>
+              <p className="font-display text-2xl font-bold">{sum}</p>
+              <p className="text-xs text-muted-foreground">{active.unit}</p>
+            </div>
+          </div>
         </div>
         <ul className="space-y-2 text-sm">
           {data.map((d) => (
             <li key={d.name} className="flex items-center gap-3">
-              <span className="h-3 w-3 shrink-0 rounded-full" style={{ background: PIE_COLOR[d.name] ?? "var(--chart-1)" }} />
-              <span className="flex-1">{d.name}</span>
+              <span className="h-3 w-3 shrink-0 rounded-full" style={{ background: d.color }} />
+              <span className="min-w-0 flex-1">
+                <span className="block truncate">{d.name}</span>
+                {d.detail && <span className="block text-xs text-muted-foreground">{d.detail}</span>}
+              </span>
               <span className="font-semibold">{d.value}</span>
               <span className="w-12 text-right text-muted-foreground">{Math.round((d.value / total) * 100)}%</span>
             </li>
