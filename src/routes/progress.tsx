@@ -130,7 +130,7 @@ function ResultsPie({ mastery, history }: { mastery: Mastery[]; history: QuizRec
         <div className="h-64">
           <ResponsiveContainer>
             <PieChart>
-              <Pie data={data} dataKey="value" nameKey="name" innerRadius="58%" outerRadius="88%" paddingAngle={1.5} stroke="none">
+              <Pie data={data} dataKey="value" nameKey="name" innerRadius="58%" outerRadius="88%" paddingAngle={1.5} stroke="none" isAnimationActive={false}>
                 {data.map((d) => <Cell key={d.name} fill={PIE_COLOR[d.name] ?? "var(--chart-1)"} />)}
               </Pie>
               <Tooltip />
